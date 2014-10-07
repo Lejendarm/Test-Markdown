@@ -11,7 +11,7 @@
   *   [] Expressions
   *   [Symbol Mangling](#symbol-mangling)
 
-###Import
+###@import
 ---------
   Permet d'importer un fichier .kh de la même façon que "include" avec une gestion de multiple inclusion.
   @import suivi d'un @from permet aussi de n'importer qu'un module spécifique du fichier.
@@ -37,13 +37,14 @@
   * Processus
 
   Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
-  Les mots clés ’#ifndef’ ’#define’ ’#endif’ sont ajouté autour de la traduction de la totalité de l'importation et
+  Les mots clés ‘#ifndef‘ ‘#define‘ ‘#endif‘ sont ajouté autour de la traduction de la totalité de l'importation et
   autour de chaque module avec le nom correspondant.
   Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
 
-###Module
+###@module
 ---------
-
+  Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function
+  non statique qui y sont associé sont traité par le Symbol Mangling pour la traduction.
 
 
 ###@class
@@ -54,54 +55,55 @@ ________
   Mais les variable d'instance ou de classe sont décorés donc opaque et nécéssite l'utilisation de la syntaxe '[ ]'.
 
   * Syntaxe
-    @class A
-    {
-      ...
-      @member
-      {
-        ...
-      }
-      @member ...;
-      ...
-    }
+
+        @class A
+        {
+          ...
+          @member
+          {
+            ...
+          }
+          @member ...;
+          ...
+        }
 
   * Processus
 
   * Example
-    @class Cla
-    {
-      int     a;
-      float   a;
-      // typedef struct _Cla  Cla;
-      // typedef struct _ClaClasse  ClaClasse;
-      // struct _ClaClasse
-      // {
-        // int  ~~a~~;
-        // float  ~~a~~;
-      // }
 
-      void    fct(void);
-      // void ~fct~(void);
+        @class Cla
+        {
+          int     a;
+          float   a;
+          // typedef struct _Cla  Cla;
+          // typedef struct _ClaClasse  ClaClasse;
+          // struct _ClaClasse
+          // {
+            // int  ~~a~~;
+            // float  ~~a~~;
+          // }
+          void    fct(void);
+          // void ~fct~(void);
 
-      @member
-      {
-        int   a;
-        float a;
-        void  fct(int);
-        void  fct(void);
-      }
-      @member char tibbers;
-      @member char get_tibbers(void);
-      // struct _Cla
-      // {
-      //  int   ~a~;
-      //  float   ~a~;
-      //  char   ~tibbers~;
-      // };
-      // void ~fct~(Cla *self, int);
-      // void ~fct~(Cla *self);
-      // char ~get_tibbers~(Cla *self);
-    }
+          @member
+          {
+            int   a;
+            float a;
+            void  fct(int);
+            void  fct(void);
+          }
+          @member char tibbers;
+          @member char get_tibbers(void);
+          // struct _Cla
+          // {
+          //  int   ~a~;
+          //  float   ~a~;
+          //  char   ~tibbers~;
+          // };
+          // void ~fct~(Cla *self, int);
+          // void ~fct~(Cla *self);
+          // char ~get_tibbers~(Cla *self);
+        }
 
 
 ###Inheritance
