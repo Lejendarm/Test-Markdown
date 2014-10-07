@@ -12,6 +12,18 @@
   *   #### [Symbol Mangling](#symbol-mangling)
 
 
+
+###@class
+________
+  le mot clef @class permet de défénir un [ADT][abstract_data_type] instantiable
+
+###Inheritance
+-----------------
+  Est applicable a tout [ADT][abstract_data_type] qui hérite de Object *
+  Requeriments: All methods/functions applicable to a *Base* class are also directly applicable to an *Inherited* class
+  VTable + RTTI
+
+
 ###Symbol Mangling
 -----------------
   *   prefix de décoration [interdit par le C][1] == '_KC'
@@ -37,13 +49,24 @@
 
         @module li
         {
+
+          char    fct(char);
+          char    *fct(char, int);
+          float     fct(void);
+
+          // char _KCM2liFC5fct1cKC_(char);
+          // char *_KCM2liFPC7fct2ciKC_(char, int);
+          // float _KCM2liFF4fct0KC_(void);
+
           @class test
           {
-            char    fct(char m);
+            char    fct(char);
             char    *fct(char, int);
-            int     fct(void);
+            float     fct(void);
+
             int     a = 3;
             double  a = 3.2;
+
             // typedef struct __KCM2liC4testKC_ _KCM2liC4testKC_ ;
             // extern _KCM2liC4testKC_ litestClass;
             // struct __KCM2liC4testKC_
@@ -52,9 +75,9 @@
             //   double  _KCM2liC4testVD1aKC_;
             // }
 
-            // char  _KCM2liC4testFC5fct1cKC_();
-            // char  *_KCM2liC4testFPC6fct2ciKC_();
-            // char  _KCM2liC4testFI4fct0KC_();
+            // char  _KCM2liC4testFC5fct1cKC_(char);
+            // char  *_KCM2liC4testFPC6fct2ciKC_(char, int);
+            // float  _KCM2liC4testFF4fct0KC_(void);
 
             @member int  fct(int);
             @member
@@ -80,19 +103,61 @@
             // void  delete(_KCM2liCM4testKC_   *);
             //
             // int _KCM2liCM4testFMI4fct0KC_(_KCM2liCM4testKC_ *);
-            // int _KCM2liCM4testFMI5fct1iKC_(_KCM2liCM4testKC_ *);
+            // int _KCM2liCM4testFMI5fct1iKC_(_KCM2liCM4testKC_ *, int);
           };
 
           int   i = 42;
           // extern int _KCM2liVI1iKC_
           float i = 4.2;
           // extern int _KCM2liVF1iKC_
+
         }
 
 #####li.kc
 
+        // int _KCM2liVI1iKC_ = 42
+        // float _KCM2liVF1iKC_ = 42
+        // _KCM2liC4testKC_ litestClass = {_KCM2liC4testVI1aKC_ = 3, _KCM2liC4testVD1aKC_ = 3.2};
         @implentation li
         {
+            char    fct(char c)
+            {
+              return (c);
+            }
+
+            //  char    _KCM2liFF4fct0KC_(char c)
+            //  {
+            //    return (c);
+            //  }
+
+            char    *fct(char c, int i)
+            {
+              static char sc = c;
+
+              !@(int)[li.i] += i;
+              return (&sc);
+            }
+
+            //  char    *_KCM2liC4testFPC6fct2ciKC_(char c, int i)
+            //  {
+            //    static char sc = c;
+
+            //    _KCM2liVI1iKC_ += i;
+            //    return (&sc);
+            //  }
+
+
+
+            float     fct(void)
+            {
+              return (!@(float)[li.i]);
+            }
+
+            // float _KCM2liFF4fct0KC_(void)
+            // {
+            //  return (_KCM2liVF1iKC_);
+            // }
+
           @implementation test
           {
 
@@ -107,6 +172,7 @@
             };
           }
         }
+
 
 #####main.kh
 
