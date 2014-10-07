@@ -2,15 +2,31 @@
 
 ## - context
 ## - Kooc
-  *   #### @import
-  *   #### @module
-  *   #### @implementation
-  *   #### @class
-  *   #### Type Checking
-  *   #### Inheritance
-  *   #### [] Expressions
-  *   #### [Symbol Mangling](#symbol-mangling)
+  *   @import
+  *   @module
+  *   @implementation
+  *   @class
+  *   Type Checking
+  *   Inheritance
+  *   [] Expressions
+  *   [Symbol Mangling](#symbol-mangling)
 
+###Import
+---------
+  Permet d'importer un fichier .kh de la même façon que "include" avec une gestion de multiple inclusion.
+  
+  *Syntaxe
+
+          @import "nom_du_fichier.kh"
+
+  * Processus
+
+          @import "nom_du_fichier.kh"
+
+
+###Module
+---------
+  
 
 ###Symbol Mangling
 -----------------
@@ -123,6 +139,7 @@
           @!(float)[l.a] = 4.2;
           return (0);
         }
+
 
 
   [1]: http://en.wikipedia.org/wiki/Name_mangling#Complex_example
