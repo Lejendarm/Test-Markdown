@@ -11,7 +11,7 @@
   *   [] Expressions
   *   [Symbol Mangling](#symbol-mangling)
 
-###Import
+###@import
 ---------
   Permet d'importer un fichier .kh de la même façon que "include" avec une gestion de multiple inclusion.
   @import suivi d'un @from permet aussi de n'importer qu'un module spécifique du fichier.
@@ -35,14 +35,16 @@
           //  endif
 
   * Processus
+ 
+  Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
+  Les mots clés ‘#ifndef‘ ‘#define‘ ‘#endif‘ sont ajouté autour de la traduction de la totalité de l'importation et
+  autour de chaque module avec le nom correspondant.
+  Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
 
-          Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
-          Les mots clés "ifndef" "define" "endif" sont ajouté autour de la traduction de la totalité de l'importation et
-          autour de chaque module avec le nom correspondant.
-          Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
-
-###Module
+###@module
 ---------
+  Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function
+  non statique qui y sont associé sont traité par le Symbol Mangling pour la traduction. 
   
 
 ###Symbol Mangling
