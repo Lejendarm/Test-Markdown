@@ -14,15 +14,32 @@
 ###Import
 ---------
   Permet d'importer un fichier .kh de la même façon que "include" avec une gestion de multiple inclusion.
-  
-  *Syntaxe
+  @import suivi d'un @from permet aussi de n'importer qu'un module spécifique du fichier.
 
-          @import "nom_du_fichier.kh"
+  * Syntaxe
+
+          @import "filename.kh"
+          //  ifndef "FILENAME"
+          //    define "FILENAME"
+          //    ...
+          //    ifndef "FILENAME_MODULENAME"
+          //      define "FILENAME_MODULENAME"
+          //      ...
+          //    endif
+          //  endif
+
+          @from "filename.kh" @import "modulename"
+          //  ifndef "FILENAME_MODULENAME"
+          //    define "FILENAME_MODULENAME"
+          //    ...
+          //  endif
 
   * Processus
 
-          @import "nom_du_fichier.kh"
-
+          Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
+          Les mots clés "ifndef" "define" "endif" sont ajouté autour de la traduction de la totalité de l'importation et
+          autour de chaque module avec le nom correspondant.
+          Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
 
 ###Module
 ---------
