@@ -36,19 +36,73 @@
 
   * Processus
 
-          Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
-          Les mots clés "ifndef" "define" "endif" sont ajouté autour de la traduction de la totalité de l'importation et
-          autour de chaque module avec le nom correspondant.
-          Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
+  Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
+  Les mots clés ’#ifndef’ ’#define’ ’#endif’ sont ajouté autour de la traduction de la totalité de l'importation et
+  autour de chaque module avec le nom correspondant.
+  Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
 
 ###Module
 ---------
-  
+
 
 
 ###@class
 ________
-  le mot clef @class permet de défénir un [ADT][abstract_data_type] instantiable
+  Le mot clef @class permet de défénir un [ADT][abstract_data_type] instantiable.
+  Toute fonction définis dans la région @membre reçoivent un pointeur sur une instance du type de l'ADT en premier parmètre sous le nom de self.
+  Le type est définis comme un type utilisateur et transparent.
+  Mais les variable d'instance ou de classe sont décorés donc opaque et nécéssite l'utilisation de la syntaxe '[ ]'.
+
+  * Syntaxe
+    @class A
+    {
+      ...
+      @member
+      {
+        ...
+      }
+      @member ...;
+      ...
+    }
+
+  * Processus
+
+  * Example
+    @class Cla
+    {
+      int     a;
+      float   a;
+      // typedef struct _Cla  Cla;
+      // typedef struct _ClaClasse  ClaClasse;
+      // struct _ClaClasse
+      // {
+        // int  ~~a~~;
+        // float  ~~a~~;
+      // }
+
+      void    fct(void);
+      // void ~fct~(void);
+
+      @member
+      {
+        int   a;
+        float a;
+        void  fct(int);
+        void  fct(void);
+      }
+      @member char tibbers;
+      @member char get_tibbers(void);
+      // struct _Cla
+      // {
+      //  int   ~a~;
+      //  float   ~a~;
+      //  char   ~tibbers~;
+      // };
+      // void ~fct~(Cla *self, int);
+      // void ~fct~(Cla *self);
+      // char ~get_tibbers~(Cla *self);
+    }
+
 
 ###Inheritance
 -----------------
