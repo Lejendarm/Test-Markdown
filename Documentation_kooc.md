@@ -69,7 +69,6 @@
           int   y = 128;
           
           void  print_on_win(char *str);
-          @class Campagne
         }
 
         int main()
@@ -80,7 +79,7 @@
 ###@implementation
 ---------
   Le @implementation permet l'implementation des fonctions associées à un module.
-   
+
   * Syntaxe
 
       @implementation Module_name
@@ -92,10 +91,32 @@
       }
 
   * Processus
-
+  L'implementation fait le liens avec les fonctions déclarées dans le module.
+  Elle contient le code de ces fonctions;
 
   * Example
 
+      @module Joke
+      {
+        void toctoc();
+      }
+
+      @implementation Joke
+      {
+        void toctoc(int i)
+        {
+          while (i > 0)
+          {
+            printf("JOKE\n");
+            i--;
+          }
+        }
+      }
+
+      int main()
+      {
+        [Joke toctoc :5];
+      }
 
 ###@class
 ________
