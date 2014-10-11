@@ -43,8 +43,58 @@
 
 ###@module
 ---------
-  Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function
-  non statique qui y sont associé sont traité par le Symbol Mangling pour la traduction.
+  Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function non statique qui y sont associé sont traité par le Symbol Mangling pour la traduction.
+
+
+  * Syntaxe
+
+        @module Module_name
+        {
+          int   i = 42;
+          void  fct();
+          ...
+        }
+
+  * Processus
+
+  Le module définit un ensemble de variable et de fonctions que l'on peu considérer comme étant globale et singleton, Il n'y a qu'une seule instance d'un module.
+  Chaque élèment ainsi définit est décoré puis inséré dans le code C;
+  /!\ Pour un élèment constant, même si la décoration est différente pour le même élèment non constant, le nom DOIT être différent pour éviter des conflits lors du traitement.
+
+  * Example
+
+        @module Config
+        {
+          int   x = 64;
+          int   y = 128;
+          
+          void  print_on_win(char *str);
+          @class Campagne
+        }
+
+        int main()
+        {
+          printf("Windows width:%d height:%d\n", [Config.x], [Config.y]);
+        }
+
+###@implementation
+---------
+  Le @implementation permet l'implementation des fonctions associées à un module.
+   
+  * Syntaxe
+
+      @implementation Module_name
+      {
+          void fct_of_module_name()
+          {
+            ...
+          }
+      }
+
+  * Processus
+
+
+  * Example
 
 
 ###@class
