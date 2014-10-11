@@ -198,7 +198,7 @@ ________
 -----------------
 	Le type checking permet de faire la différence entre des variables ou fonctions de même nom mais de types, ou prenant des paramètres, différents.
 	Le type checking du projet KOOC sera relativement stricte, tout ce qui ne sera pas explicite génèrera une erreur de compilation.
-	Dans les cas où le type sera impossible a déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue.
+	Dans les cas où le type sera impossible à déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue.
 
 	* Example
 	
