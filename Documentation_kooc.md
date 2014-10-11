@@ -1,7 +1,24 @@
-# Documentation Kooc
+# Documentation KOOC
 
 ## - context
-## - Kooc
+
+	*	Pourquoi le KOOC
+
+			Nous sommes trois étudiants d'Epitech, ayant été charmés par les languages objets et par la piscine Parsing ayant pris lieu le 15/09/2014.
+			La curiosité nous a régulièrement poussé à nous poser des questions de notre côté sur le fonctionnement des languages objets,
+			c'est donc naturellement que nous avons vu une aubaine dans le projet KOOC qui nous permet aujourd'hui de concrétiser cette curiosité, et de pousser plus loin notre réflexion.
+
+	* Qu'est-ce que le KOOC
+
+			L'objectif du projet KOOC (kind of objective C) est d'implémenter une sur-couche de language objet au language C, qui lui donnera un aspect proche du language Objective C.
+			Le KOOC permettra de pallier à certains problèmes du C en implémentant des fonctionnalités non présentes à la base.
+			Le projet permettra par exemple :
+				- De déclarer des variables ou des fonctions de même nom, mais possédant des types ou des paramètres différents.
+				- D'importer des fichiers sans avoir besoin de les protéger contre la multiple inclusion à la main.
+				- D'implémenter un système de classe, qui n'est pas présent a la base en language C.
+			Et bien d'autres choses.
+
+## - KOOC
   *   @import
   *   @module
   *   @implementation
@@ -13,7 +30,7 @@
 
 ###@import
 ---------
-  Permet d'importer un fichier .kh de la même façon que "include" avec une gestion de multiple inclusion.
+  Permets d'importer un fichier .kh de la même façon que "include" avec une gestion de multiples inclusions.
   @import suivi d'un @from permet aussi de n'importer qu'un module spécifique du fichier.
 
   * Syntaxe
@@ -44,15 +61,15 @@
 ###@module
 ---------
   Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function
-  non statique qui y sont associé sont traité par le Symbol Mangling pour la traduction.
+  non statique qui y sont associées sont traité par le "Symbol Mangling" pour la traduction.
 
 
 ###@class
 ________
-  Le mot clef @class permet de défénir un [ADT][abstract_data_type] instantiable.
-  Toute fonction définis dans la région @membre reçoivent un pointeur sur une instance du type de l'ADT en premier parmètre sous le nom de self.
-  Le type est définis comme un type utilisateur et transparent.
-  Mais les variable d'instance ou de classe sont décorés donc opaque et nécéssite l'utilisation de la syntaxe '[ ]'.
+  Le mot-clef @class permet de définir un [ADT][abstract_data_type] instantiable.
+  Toute fonction définie dans la région @membre reçoivent un pointeur sur une instance du type de l'ADT en premier paramètre sous le nom de self.
+  Le type est défini comme un type utilisateur et transparent.
+  Mais les variables d'instance ou de classe sont décorées donc opaques et nécessitent l'utilisation de la syntaxe "[ ]".
 
   * Syntaxe
 
@@ -106,9 +123,41 @@ ________
         }
 
 
+###Type Checking
+-----------------
+	Le type checking permet de faire la différence entre des variables ou fonctions de même nom mais de types, ou prenant des paramètres, différents.
+	Le type checking du projet KOOC sera relativement stricte, tout ce qui ne sera pas explicite génèrera une erreur de compilation.
+	Dans les cas où le type sera impossible a déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue.
+
+	* Example
+	
+	#####c.kh
+
+			@module c
+			{
+        int     a;
+        float   a;
+        double  a;
+        void    fct(int);
+        void    fct(void);
+        int     fct(char);
+        float   fct(double);
+			}
+
+  ######c.kc
+    @import "c.kh"
+    int         main()
+    {
+      [c.a] = [c fct :c.a]; // Appellera : float   fct(double);
+      [c fct]; // Appellera : void   fct(void);
+      if ([c fct :c.a]) {} // Appellera : int   fct(int); car le "if" attend un retour.
+      @!(double)c.a = 4.86; // L'utilisation de la syntaxe "@!("type")" est ici obligatoire pour que le compilateur sache si l'affectation doit se faire sur la variable de type double ou float.
+      [c fct :c.a] // Appellera la fonction void  fct(int); car l'appel est en dehors de tout contexte.
+    }
+
 ###Inheritance
 -----------------
-  Est applicable a tout [ADT][abstract_data_type] qui hérite de Object *
+  Est applicable à tout [ADT][abstract_data_type] qui hérite de Object *
   Requeriments: All methods/functions applicable to a *Base* class are also directly applicable to an *Inherited* class
   VTable + RTTI
 
@@ -118,15 +167,15 @@ ________
   *   prefix de décoration [interdit par le C][1] == '_KC'
   *   puis décration sous paire '\<type + len, name\>'
       1.  type
-          V pour variable suivit de l'inital du type si de type scalaire sinon nom du type
-          F \(+M si méthode\) pour fonction suivit de l'inital du type de valeur de retour si de type scalaire sinon nom du type
-          M pour module
-          C pour class CM pour class member
+          V pour "variable" suivit de l'inital du type si de type scalaire sinon nom du type
+          F \(+M si méthode\) pour "fonction" suivit de l'inital du type de valeur de retour si de type scalaire sinon nom du type
+          M pour "module"
+          C pour "class" CM pour "class member"
       2. len
           Longueur du name
       3. name
           si variable nom de la variable
-          si fonction nom de la fonction suvit d'un nombre de variable et types
+          si fonction nom de la fonction suivit d'un nombre de variable et types
 
   *   puis décoration de fin == 'KC_'
   ainsi
@@ -173,7 +222,7 @@ ________
             {
               int   a;
               float a;
-              float troll;
+              float b;
               int   fct(void);
 
               // int   fct(int);
@@ -234,8 +283,6 @@ ________
             //    _KCM2liVI1iKC_ += i;
             //    return (&sc);
             //  }
-
-
 
             float     fct(void)
             {
