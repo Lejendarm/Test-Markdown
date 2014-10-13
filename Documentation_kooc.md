@@ -84,7 +84,7 @@
         {
           int   x = 64;
           int   y = 128;
-          
+
           void  print_on_win(char *str);
         }
 
@@ -201,7 +201,7 @@ ________
 	Dans les cas où le type sera impossible à déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue.
 
 	* Example
-	
+
 	#####c.kh
 
 			@module c
@@ -222,7 +222,7 @@ ________
       [c.a] = [c fct :c.a]; // Appellera : float   fct(double);
       [c fct]; // Appellera : void   fct(void);
       if ([c fct :c.a]) {} // Appellera : int   fct(int); car le "if" attend un retour.
-      @!(double)c.a = 4.86; // L'utilisation de la syntaxe "@!("type")" est ici obligatoire pour que le compilateur sache si l'affectation doit se faire sur la variable de type double ou float.
+      @!(double)[c.a] = 4.86; // L'utilisation de la syntaxe "@!("type")" est ici obligatoire pour que le compilateur sache si l'affectation doit se faire sur la variable de type double ou float.
       [c fct :c.a] // Appellera la fonction void  fct(int); car l'appel est en dehors de tout contexte.
     }
 
@@ -236,7 +236,7 @@ ________
 ###Symbol Mangling
 -----------------
   *   prefix de décoration [interdit par le C][1] == '_KC'
-  *   puis décration sous paire '\<type + len, name\>'
+  *   puis décration sous paire 'type + len + name'
       1.  type
           V pour "variable" suivit de l'inital du type si de type scalaire sinon nom du type
           F \(+M si méthode\) pour "fonction" suivit de l'inital du type de valeur de retour si de type scalaire sinon nom du type
