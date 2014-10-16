@@ -1,25 +1,31 @@
 # Documentation KOOC
 
-## - context
+## context
 
-	*	Pourquoi le KOOC
+*	Pourquoi le KOOC
 
-			Nous sommes trois étudiants d'Epitech, ayant été charmés par les languages objets et par la piscine Parsing ayant pris lieu le 15/09/2014.
-			La curiosité nous a régulièrement poussé à nous poser des questions de notre côté sur le fonctionnement des languages objets,
-			c'est donc naturellement que nous avons vu une aubaine dans le projet KOOC qui nous permet aujourd'hui de concrétiser cette curiosité, et de pousser plus loin notre réflexion.
+		Nous sommes trois étudiants d'Epitech, ayant été charmés par les languages objets et par
+    la piscine Parsing ayant pris lieu le 15/09/2014.
+		La curiosité nous a régulièrement poussé à nous poser des questions de notre côté sur le
+    fonctionnement des languages objets, c'est donc naturellement que nous avons vu une aubaine
+    dans le projet KOOC qui nous permet aujourd'hui de concrétiser cette curiosité, et de pousser
+    plus loin notre réflexion.
 
-	* Qu'est-ce que le KOOC
+* Qu'est-ce que le KOOC
 
-			L'objectif du projet KOOC (kind of objective C) est d'implémenter une sur-couche de language objet au language C, qui lui donnera un aspect proche du language Objective C.
-			Le KOOC permettra de pallier à certains problèmes du C en implémentant des fonctionnalités non présentes à la base.
-			Le projet permettra par exemple :
-				- De déclarer des variables ou des fonctions de même nom, mais possédant des types ou des signatures différents.
-				- D'importer des fichiers sans avoir besoin de les protéger contre la multiple inclusion à la main.
-				- D'implémenter un système de classe, qui n'est pas présent a la base en language C.
-			Et bien d'autres choses.
+	L'objectif du projet KOOC (kind of objective C) est d'implémenter une sur-couche de language
+  objet au language C, qui lui donnera un aspect proche du language Objective C.
 
-## - KOOC
----------
+  Le KOOC permettra de pallier à certains problèmes du C en implémentant des fonctionnalités
+  non présentes à la base.
+
+  Le projet permettra par exemple
+	- De déclarer des variables ou des fonctions de même nom, mais possédant des types ou des signatures différents.
+	- D'importer des fichiers sans avoir besoin de les protéger contre la multiple inclusion à la main.
+	- D'implémenter un système de classe, qui n'est pas présent a la base en language C.
+  - Et bien d'autres choses.
+
+## KOOC
   *   [Design global](#design-global)
   *   [syntaxes](#syntaxes)
     -   [@import](#@import)
