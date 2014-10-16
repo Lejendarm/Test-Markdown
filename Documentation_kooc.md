@@ -13,20 +13,51 @@
 			L'objectif du projet KOOC (kind of objective C) est d'implémenter une sur-couche de language objet au language C, qui lui donnera un aspect proche du language Objective C.
 			Le KOOC permettra de pallier à certains problèmes du C en implémentant des fonctionnalités non présentes à la base.
 			Le projet permettra par exemple :
-				- De déclarer des variables ou des fonctions de même nom, mais possédant des types ou des paramètres différents.
+				- De déclarer des variables ou des fonctions de même nom, mais possédant des types ou des signatures différents.
 				- D'importer des fichiers sans avoir besoin de les protéger contre la multiple inclusion à la main.
 				- D'implémenter un système de classe, qui n'est pas présent a la base en language C.
 			Et bien d'autres choses.
 
 ## - KOOC
-  *   @import
-  *   @module
-  *   @implementation
-  *   @class
-  *   Type Checking
-  *   Inheritance
-  *   [] Expressions
-  *   [Symbol Mangling](#symbol-mangling)
+---------
+  *   [Design global](#design-global)
+  *   [syntaxes](#syntaxes)
+    -   [@import](#@import)
+    -   [@module](#@module)
+    -   [@implementation](#@implementation)
+    -   [@class](#@class)
+    -   [Kooc Expressions](#kooc-expressions)
+  *   [concepts](#concepts)
+    -   [Type Checking](#type-checking)
+    -   [Inheritance](#inheritance)
+    -   [Symbol Mangling](#symbol-mangling)
+
+
+# Design global
+---------------
+  De manière général l'interpréteur Kooc est un ensemble de plugins. Chaque element de syntaxe ou qui relève
+  des concepts d'interpations des syntaxes est un plugin. Le kooc utilise donc une classe KoocPluginManager
+  qui sert à intégrer et à gérer les interactions entre les diférents plugin.
+
+  Chaque Plugin implémente une fonction d'enregistrement qui lui permettera de gérer ses dépendences. Ainsi
+  si un plugin necessite l'utilisation d'autres plugins il va dans un premier temps vérifier leur présence
+  dans le KoocPluginManager, puis il va étendre ce dernier a l'aide d'un Helper pour mettre en place cette
+  interaction. Cette étape n'est pas obligatoire car le fonctionnement de chaque Plugin est indépendant.
+
+      Toute fois un nombre de plugins obligatoires est nécéssaire au bon fonctionnement du Kooc les retirer
+      nuira a l'interprétation de fonctionnalités basiques.
+
+  Ce choix de composition permet d'étendre à volonté les syntaxes interpreter par le kooc ainsi que de
+  rajouter un nombre de concepts importants sans géner le fonctionnement de base.
+
+  Puis le kooc fait appel a son parseur enrichie par les diférents plugins.
+
+  Le parseur a une mémoire interne des symboles trouvés dans les différents headers kooc.
+  Ce qui lui permet de ne pas parser à chaque @import d'un fichier mais de charger directement
+  les symboles qui y sont défénis.
+
+# Syntaxes
+----------
 
 ###@import
 ---------
@@ -61,7 +92,7 @@
 ###@module
 ---------
   Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function
-  non statique qui y sont associées sont traité par le "Symbol Mangling" pour la traduction.
+  non statique qui y sont associées sont traitées par le "Symbol Mangling" pour la traduction.
 
   * Syntaxe
 
@@ -194,11 +225,13 @@ ________
         }
 
 
+###Kooc syntax
+--------------
+
 ###Type Checking
 -----------------
-	Le type checking permet de faire la différence entre des variables ou fonctions de même nom mais de types, ou prenant des paramètres, différents.
-	Le type checking du projet KOOC sera relativement stricte, tout ce qui ne sera pas explicite génèrera une erreur de compilation.
-	Dans les cas où le type sera impossible à déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue.
+  Le type checking est un systeme utilisé par le KOOK pour déterminer quelle surcharge de variable ou de fonction est utilisé selon le type ou la signature de la fonction.
+	Dans les cas où le type sera impossible à déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue. Sinon une erreur de parsing est lancée.
 
 	* Example
 
@@ -215,15 +248,27 @@ ________
         float   fct(double);
 			}
 
-  ######c.kc
+  ######main.kc
     @import "c.kh"
     int         main()
     {
-      [c.a] = [c fct :c.a]; // Appellera : float   fct(double);
-      [c fct]; // Appellera : void   fct(void);
-      if ([c fct :c.a]) {} // Appellera : int   fct(int); car le "if" attend un retour.
-      @!(double)[c.a] = 4.86; // L'utilisation de la syntaxe "@!("type")" est ici obligatoire pour que le compilateur sache si l'affectation doit se faire sur la variable de type double ou float.
-      [c fct :c.a] // Appellera la fonction void  fct(int); car l'appel est en dehors de tout contexte.
+      [c.a] = [c fct :c.a];
+      // Appele float fct(double);
+      // assigne ~c~float~a~;
+
+      [c fct];
+      // Appele void   fct(void);
+
+      if ([c fct :c.a]) {}
+      // Appele int   fct(int);
+      // car le "if" attend un retour.
+
+      @!(double)[c.a] = 4.86;
+      // L'utilisation de la syntaxe "@!("type")" est ici obligatoire
+      // pour que le compilateur sache si l'affectation doit se faire sur la variable de type double ou float.
+
+      [c fct :c.a]
+      // Appele la fonction void fct(int); car la valeur de retour n'est pas utlisée et qu'un paramètre est attendu.
     }
 
 ###Inheritance
@@ -235,6 +280,7 @@ ________
 
 ###Symbol Mangling
 -----------------
+  *   Si un mot clef du C ou une défintion de type il n'y a pas de symbol mangling généré
   *   prefix de décoration [interdit par le C][1] == '_KC'
   *   puis décration sous paire 'type + len + name'
       1.  type
@@ -249,8 +295,6 @@ ________
           si fonction nom de la fonction suivit d'un nombre de variable et types
 
   *   puis décoration de fin == 'KC_'
-  ainsi
-
 
 
 
@@ -258,75 +302,76 @@ ________
 
         @module li
         {
+          char    fct(char);
+          char    *fct(char, int);
+          float   fct(void);
 
+          // char _KCM2liFC5fct1cKC_(char);
+          // char *_KCM2liFPC6fct2ciKC_(char, int);
+          // float _KCM2liFF4fct0KC_(void);
+
+          int   i = 42;
+          float i = 4.2;
+          // extern int _KCM2liVI1iKC_
+          // extern float _KCM2liVF1iKC_
+        }
+
+        @class test
+        {
           char    fct(char);
           char    *fct(char, int);
           float     fct(void);
 
-          // char _KCM2liFC5fct1cKC_(char);
-          // char *_KCM2liFPC7fct2ciKC_(char, int);
-          // float _KCM2liFF4fct0KC_(void);
+          int     a = 3;
+          double  a = 3.2;
 
-          @class test
+          // typedef struct testClass_ testClass;
+          // extern testClass _testClass;
+          // int  _KCC4testVI1aKC_;
+          // double  _KCMC4testVD1aKC_;
+
+          char    fct(char);
+          char    *fct(char, int);
+          float   fct(void);
+
+          // char  _KCMC4testFC5fct1cKC_(char);
+          // char  *_KCMC4testFPC6fct2ciKC_(char, int);
+          // float  _KCMC4testFF4fct0KC_(void);
+
+          @member int  fct(int);
+          @member
           {
-            char    fct(char);
-            char    *fct(char, int);
-            float     fct(void);
+            int   a;
+            float a;
+            float b;
+            int   fct(void);
 
-            int     a = 3;
-            double  a = 3.2;
+            // int   fct(int);
+            // int _KCCM4testFMI5fct1iKC_();
+            // Would produce a conflict error
+          }
+          // typedef struct test_ test;
+          // struct test_
+          // {
+          //   int _KCCM4testVI1aKC_;
+          //   int _KCCM4testVF1aKC_;
+          //   int _KCCM4testVF4trollKC_;
+          // };
+          //
+          // test   *new();
+          // void  delete(test *);
+          //
+          // int _KCCM4testFMI4fct0KC_(test *);
+          // int _KCCM4testFMI5fct1iKC_(test *, int);
+        };
 
-            // typedef struct __KCM2liC4testKC_ _KCM2liC4testKC_ ;
-            // extern _KCM2liC4testKC_ litestClass;
-            // struct __KCM2liC4testKC_
-            // {
-            //   int  _KCM2liC4testVI1aKC_;
-            //   double  _KCM2liC4testVD1aKC_;
-            // }
-
-            // char  _KCM2liC4testFC5fct1cKC_(char);
-            // char  *_KCM2liC4testFPC6fct2ciKC_(char, int);
-            // float  _KCM2liC4testFF4fct0KC_(void);
-
-            @member int  fct(int);
-            @member
-            {
-              int   a;
-              float a;
-              float b;
-              int   fct(void);
-
-              // int   fct(int);
-              // int _KCM2liCM4testFMI5fct1iKC_();
-              // Would produce a conflict error
-            }
-            // typedef struct __KCM2liCM4testKC_ _KCM2liCM4testKC_ ;
-            // struct __KCM2liCM4testKC_
-            // {
-            //   int _KCM2liCM4testVI1aKC_;
-            //   int _KCM2liCM4testVF1aKC_;
-            //   int _KCM2liCM4testVF4trollKC_;
-            // }
-            //
-            // _KCM2liCM4testKC_   *new();
-            // void  delete(_KCM2liCM4testKC_   *);
-            //
-            // int _KCM2liCM4testFMI4fct0KC_(_KCM2liCM4testKC_ *);
-            // int _KCM2liCM4testFMI5fct1iKC_(_KCM2liCM4testKC_ *, int);
-          };
-
-          int   i = 42;
-          // extern int _KCM2liVI1iKC_
-          float i = 4.2;
-          // extern int _KCM2liVF1iKC_
-
-        }
 
 #####li.kc
 
-        // int _KCM2liVI1iKC_ = 42
-        // float _KCM2liVF1iKC_ = 42
-        // _KCM2liC4testKC_ litestClass = {_KCM2liC4testVI1aKC_ = 3, _KCM2liC4testVD1aKC_ = 3.2};
+        // int _KCM2liVI1iKC_ = 42;
+        // float _KCM2liVF1iKC_ = 42;
+        // _KCC4testVI1aKC_ = 3;
+        // _KCC4testVD1aKC_ = 3.2;
         @implentation li
         {
             char    fct(char c)
@@ -347,7 +392,7 @@ ________
               return (&sc);
             }
 
-            //  char    *_KCM2liC4testFPC6fct2ciKC_(char c, int i)
+            //  char    *_KCM2liFPC6fct2ciKC_(char c, int i)
             //  {
             //    static char sc = c;
 
@@ -364,20 +409,51 @@ ________
             // {
             //  return (_KCM2liVF1iKC_);
             // }
+        }
 
-          @implementation test
+        @implementation test
+        {
+
+          char    fct(char m)
           {
-
-            char    fct(char m)
-            {
-              return(m);
-            }
-
-            int     fct(void)
-            {
-              return (1);
-            };
+            return(m);
           }
+
+          float     fct(void)
+          {
+            return (1);
+          };
+
+          char    *fct(char c, int i)
+          {
+            char  *ret = malloc(sizeof(char) * i + 1);
+
+            while (--i)
+              if (ret)
+                strncpy(ret, &c, 1);
+            return (ret);
+          }
+
+          // char  _KCMC4testFC5fct1cKC_(char m)
+          // {
+          //    return (m);
+          // }
+
+          // char  *_KCMC4testFPC6fct2ciKC_(char c, int i)
+          // {
+          //  char  *ret = malloc(sizeof(char) * i + 1);
+          //
+          //  while (--i)
+          //    if (ret)
+          //      strncpy(ret, &c, 1);
+          //  return (ret);
+          // }
+
+          // float  _KCMC4testFF4fct0KC_(void)
+          // {
+          //  return (1);
+          // }
+
         }
 
 
@@ -386,7 +462,7 @@ ________
         @import "li.kh"
 
         int     main() {
-          [li.test] *l = [li.test new] ;
+          test      *l = [li.test new] ;
           int       x;
           char      d;
 
