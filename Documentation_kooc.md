@@ -22,7 +22,7 @@
   Le projet permettra par exemple
 	- De déclarer des variables ou des fonctions de même nom, mais possédant des types ou des signatures différents.
 	- D'importer des fichiers sans avoir besoin de les protéger contre la multiple inclusion à la main.
-	- D'implémenter un système de classe, qui n'est pas présent a la base en language C.
+	- D'implémenter un système de classe, qui n'est pas présent à la base en language C.
   - Et bien d'autres choses.
 
 ## KOOC
@@ -41,24 +41,24 @@
 
 # Design global
 ---------------
-  De manière général l'interpréteur Kooc est un ensemble de plugins. Chaque element de syntaxe ou qui relève
-  des concepts d'interpations des syntaxes est un plugin. Le kooc utilise donc une classe KoocPluginManager
-  qui sert à intégrer et à gérer les interactions entre les diférents plugin.
+  De manière générale l'interpréteur Kooc est un ensemble de plugins. Chaque élement de syntaxe ou qui relève
+  des concepts d'interpretations des syntaxes est un plugin. Le kooc utilise donc une classe KoocPluginManager
+  qui sert à intégrer et à gérer les interactions entre les différents plugin.
 
   Chaque Plugin implémente une fonction d'enregistrement qui lui permettera de gérer ses dépendences. Ainsi
-  si un plugin necessite l'utilisation d'autres plugins il va dans un premier temps vérifier leur présence
-  dans le KoocPluginManager, puis il va étendre ce dernier a l'aide d'un Helper pour mettre en place cette
+  si un plugin nécessite l'utilisation d'autres plugins, il va dans un premier temps vérifier leur présence
+  dans le KoocPluginManager, puis il va étendre ce dernier à l'aide d'un Helper pour mettre en place cette
   interaction. Cette étape n'est pas obligatoire car le fonctionnement de chaque Plugin est indépendant.
 
-      Toute fois un nombre de plugins obligatoires est nécéssaire au bon fonctionnement du Kooc les retirer
-      nuira a l'interprétation de fonctionnalités basiques.
+      Toutefois un nombre de plugins obligatoires est nécéssaire au bon fonctionnement du Kooc, les retirer
+      nuira a l'interpretation de fonctionnalités basiques.
 
-  Ce choix de composition permet d'étendre à volonté les syntaxes interpreter par le kooc ainsi que de
+  Ce choix de composition permet d'étendre à volonté les syntaxes interpretées par le kooc ainsi que de
   rajouter un nombre de concepts importants sans géner le fonctionnement de base.
 
-  Puis le kooc fait appel a son parseur enrichie par les diférents plugins.
+  Puis le kooc fait appel à son parseur enrichi par les diférents plugins.
 
-  Le parseur a une mémoire interne des symboles trouvés dans les différents headers kooc.
+  Le parseur à une mémoire interne des symboles trouvés dans les différents headers kooc.
   Ce qui lui permet de ne pas parser à chaque @import d'un fichier mais de charger directement
   les symboles qui y sont défénis.
 
@@ -68,7 +68,7 @@
 ###@import
 ---------
   Permets d'importer un fichier .kh de la même façon que "include" avec une gestion de multiples inclusions.
-  @import suivi d'un @from permet aussi de n'importer qu'un module spécifique du fichier.
+  @import précédé d'un @from permet aussi de n'importer qu'un module spécifique du fichier.
 
   * Syntaxe
 
@@ -88,17 +88,16 @@
           //    ...
           //  endif
 
-  * Processus
-
-  Les informations importées sont traduite spécifiquement comme détaillé dans les autres parties.
-  Les mots clés ‘#ifndef‘ ‘#define‘ ‘#endif‘ sont ajouté autour de la traduction de la totalité de l'importation et
-  autour de chaque module avec le nom correspondant.
-  Cette manipulation permet de gèrer des conflits d'inclusion multiple et de pouvoir importer un module séparèment.
+   * Processus
+ 
+ On repère le mot clé @import qui a été rajouté par le importPlugin. le plugin lance un parsefile sur le fichier.
+ Les mots clés ‘#ifndef‘ ‘#define‘ ‘#endif‘ sont ajouté autour de la traduction de la totalité de l'importation et autour de chaque module.
+ Si le fichier a déja été sauvegardé, on ne le traduit pas de nouveau.
 
 ###@module
 ---------
-  Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et function
-  non statique qui y sont associées sont traitées par le "Symbol Mangling" pour la traduction.
+  Le @module situé principalement dans le .kh, marque le début d'une déclaration de module. Toutes les variables et fonctions
+  non statiques qui y sont associées sont traitées par le "Symbol Mangling" pour la traduction.
 
   * Syntaxe
 
@@ -111,9 +110,17 @@
 
   * Processus
 
-  Le module définit un ensemble de variable et de fonctions que l'on peu considérer comme étant globale et singleton, Il n'y a qu'une seule instance d'un module.
+  Le module définit un ensemble de variables et de fonctions que l'on peut considérer comme étant globale et singleton, Il n'y a qu'une seule instance d'un module.
   Chaque élèment ainsi définit est décoré puis inséré dans le code C;
   /!\ Pour un élèment constant, même si la décoration est différente pour le même élèment non constant, le nom DOIT être différent pour éviter des conflits lors du traitement.
+
+  Pour détailler le processus:
+
+  On charge le ModulePlugin grâce à la fonction load_plugin du pluginManager.
+  Le helper associé ModulePlugin repère la déclaration @module pendant le parsing et appelle les plugins dont il a besoin.
+  Dans un premier temps le SymbolManglingPlugin va décorer les informations.
+  Dans un seconds temp c'est le ModulePlugin qui va traiter les informations précédement décoré.
+  A la fin du parsing le buildFile va créer le code C à partir de ces informations.
 
   * Example
 
@@ -132,7 +139,7 @@
 
 ###@implementation
 ---------
-  Le @implementation permet l'implementation des fonctions associées à un module.
+  Le @implementation permet l'implémentation des fonctions associées à un module.
 
   * Syntaxe
 
@@ -145,7 +152,7 @@
       }
 
   * Processus
-  L'implementation fait le liens avec les fonctions déclarées dans le module.
+  L'implémentation fait le lien avec les fonctions déclarées dans le module.
   Elle contient le code de ces fonctions;
 
   * Example
@@ -174,8 +181,8 @@
 
 ###@class
 ________
-  Le mot-clef @class permet de définir un [ADT][abstract_data_type] instantiable.
-  Toute fonction définie dans la région @membre reçoivent un pointeur sur une instance du type de l'ADT en premier paramètre sous le nom de self.
+  Le mot-clef @class permet de définir un [ADT][abstract_data_type] instanciable.
+  Toutes fonctions définies dans la région @membre reçoivent un pointeur sur une instance du type de l'ADT en premier paramètre sous le nom de self.
   Le type est défini comme un type utilisateur et transparent.
   Mais les variables d'instance ou de classe sont décorées donc opaques et nécessitent l'utilisation de la syntaxe "[ ]".
 
@@ -236,7 +243,7 @@ ________
 
 ###Type Checking
 -----------------
-  Le type checking est un systeme utilisé par le KOOK pour déterminer quelle surcharge de variable ou de fonction est utilisé selon le type ou la signature de la fonction.
+  Le type checking est un système utilisé par le KOOK pour déterminer quelle surcharge de variable ou de fonction est utilisée selon le type ou la signature de la fonction.
 	Dans les cas où le type sera impossible à déterminer, la syntaxe "@!("type")" sera utilisée pour forcer le choix de la variable ou fonction voulue. Sinon une erreur de parsing est lancée.
 
 	* Example
