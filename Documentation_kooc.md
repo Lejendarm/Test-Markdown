@@ -1,10 +1,10 @@
 # Documentation KOOC
 
-## context
+## Context
 
 *	Pourquoi le KOOC
 
-		Nous sommes trois étudiants d'Epitech, ayant été charmés par les languages objets et par
+	Nous sommes trois étudiants d'Epitech, ayant été charmés par les languages objets et par
     la piscine Parsing ayant pris lieu le 15/09/2014.
 		La curiosité nous a régulièrement poussé à nous poser des questions de notre côté sur le
     fonctionnement des languages objets, c'est donc naturellement que nous avons vu une aubaine
@@ -62,18 +62,19 @@
   Ce qui lui permet de ne pas parser à chaque @import d'un fichier mais de charger directement
   les symboles qui y sont défénis.
 
-![alt text](https://github.com/mohame_e/kooc/KOOC.png "Logo Title Text 1")
+# Processus
+-----------
+![alt text](KOOC.png "Schéma de conception")
+
+
+1. La methode load_plugin du PluginManager va charger le plugin spécifié.
+2. Le plugin ainsi chargé va rajouter sa syntaxe et ses metahooks au Parser.
+3. Lors du parsing le PluginManager fait constamment une boucle sur l'ensemble des helper pour analyser les informations parsées.
+3. Le helper ou les hooks associés au plugin vont repèrer la syntaxe précédemment ajoutée et se déclencher.
+4. A la fin du parsing le BuildFile va créer le code C à partir des informations traduites.
 
 # Syntaxes
 ----------
-
- * Les Plugins
-
-  Notre conception du kooc se base sur un fonctionnement à l'aide de plugins.
-
-
-
-
 
 ###@import
 ---------
@@ -124,13 +125,7 @@
   Chaque élèment ainsi définit est décoré puis inséré dans le code C;
   /!\ Pour un élèment constant, même si la décoration est différente pour le même élèment non constant, le nom DOIT être différent pour éviter des conflits lors du traitement.
 
-  Pour détailler le processus:
-
-  On charge le ModulePlugin grâce à la fonction load_plugin du pluginManager.
-  Le helper associé ModulePlugin repère la déclaration @module pendant le parsing et appelle les plugins dont il a besoin.
-  Dans un premier temps le SymbolManglingPlugin va décorer les informations.
-  Dans un seconds temp c'est le ModulePlugin qui va traiter les informations précédement décoré.
-  A la fin du parsing le buildFile va créer le code C à partir de ces informations.
+  Le hook associé au @module va se déclencher suite au hook de la décoration soit effectuée, puis il va appeler le ModulePlugin pour traduire le module en code C.
 
   * Example
 
@@ -168,13 +163,9 @@
           }
       }
 
-  * Pour détailler le processus:
-
-  On charge le ModulePlugin grâce à la fonction load_plugin du pluginManager.
-  Le helper associé ModulePlugin repère la déclaration @module pendant le parsing et appelle les plugins dont il a besoin.
-  Dans un premier temps le SymbolManglingPlugin va décorer les informations.
-  Dans un seconds temp c'est le ModulePlugin qui va traiter les informations précédement décoré.
-  A la fin du parsing le buildFile va créer le code C à partir de ces informations.
+  * Processus
+  
+  	Le helper associé au ImplementationPlugin va dans un premier temps appeler le SyntaxeManglingPlugin pour que la décoration soit effectuée, puis il va appeler le ImplementationPlugin pour traduire le module en code C.
 
   * Example
 
@@ -221,6 +212,9 @@ ________
         }
 
   * Processus
+
+Le helper associé au ClassPlugin va dans un premier temps appeler le ClassPlugin pour que la décoration soit effectuée, puis il va appeler le ImplementationPlugin pour traduire le module en code C.
+
 
   * Example
 
