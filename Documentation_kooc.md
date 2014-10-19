@@ -62,8 +62,18 @@
   Ce qui lui permet de ne pas parser à chaque @import d'un fichier mais de charger directement
   les symboles qui y sont défénis.
 
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+
 # Syntaxes
 ----------
+
+ * Les Plugins
+
+  Notre conception du kooc se base sur un fonctionnement à l'aide de plugins.
+
+
+
+
 
 ###@import
 ---------
@@ -126,20 +136,27 @@
 
         @module Config
         {
-          int   x = 64;
-          int   y = 128;
+          int     x = 64;
+          float   fy = 12.1;
 
-          void  print_on_win(char *str);
+          void  print(char *str);
         }
+
+        // extern int   _KCM6ConfigVI1xKC_ = 64;
+        // extern float _KCM6ConfigVF2fyKC_ = 12.1;
+        // void         _KCM6ConfigFV8print1pcKC_(char $);
 
         int main()
         {
-          printf("Windows width:%d height:%d\n", [Config.x], [Config.y]);
+          int z;
+
+          z = [Config.x] + 3;
+          // z = _KCM6ConfigVI1xKC_ + 3; 
         }
 
 ###@implementation
 ---------
-  Le @implementation permet l'implémentation des fonctions associées à un module.
+  Le @implementation permet l'implémentation des fonctions associées à un module. le plugin associé devra créer les fonctions que l'utilisateur veut implémenter dans un module.
 
   * Syntaxe
 
@@ -151,9 +168,13 @@
           }
       }
 
-  * Processus
-  L'implémentation fait le lien avec les fonctions déclarées dans le module.
-  Elle contient le code de ces fonctions;
+  * Pour détailler le processus:
+
+  On charge le ModulePlugin grâce à la fonction load_plugin du pluginManager.
+  Le helper associé ModulePlugin repère la déclaration @module pendant le parsing et appelle les plugins dont il a besoin.
+  Dans un premier temps le SymbolManglingPlugin va décorer les informations.
+  Dans un seconds temp c'est le ModulePlugin qui va traiter les informations précédement décoré.
+  A la fin du parsing le buildFile va créer le code C à partir de ces informations.
 
   * Example
 
